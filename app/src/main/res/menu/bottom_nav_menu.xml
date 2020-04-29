@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_movies_list"
+        android:icon="@drawable/ic_action_sunny"
+        android:title="@string/title_today" />
+
+    <item
+        android:id="@+id/navigation_favorite_actors"
+        android:icon="@drawable/ic_action_cloudy"
+        android:title="@string/title_forecast" />
+
+</menu>

@@ -5,8 +5,8 @@ import android.os.Bundle
 import android.widget.Toast
 import com.example.testappweatherforecast.R
 import com.example.testappweatherforecast.mvp.presentation.MainPresenter
+import com.example.testappweatherforecast.mvp.ui.FlowFragment
 import com.example.testappweatherforecast.mvp.ui.MainView
-import kotlinx.android.synthetic.main.activity_main.*
 import moxy.MvpAppCompatActivity
 import moxy.ktx.moxyPresenter
 
@@ -16,13 +16,18 @@ import moxy.ktx.moxyPresenter
      override fun onCreate(savedInstanceState: Bundle?) {
          super.onCreate(savedInstanceState)
          setContentView(R.layout.activity_main)
-         button.setOnClickListener{
-             myPresenter.getLocation(this)
+
+         if(savedInstanceState == null){
+             supportFragmentManager.beginTransaction()
+                 .replace(R.id.containerForFlowFragment, FlowFragment()).commitNow()
          }
+         /*button.setOnClickListener{
+             myPresenter.getLocation(this)
+         }*/
      }
 
      override fun getLocation(location: String) {
-         text.setText(location)
+         //text.setText(location)
      }
 
      override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,
