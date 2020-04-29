@@ -1,18 +1,17 @@
  package com.example.testappweatherforecast.mvp
 
 import LocationService
-import android.content.Context
-import android.location.LocationManager
 import android.os.Bundle
+import android.widget.Toast
 import com.example.testappweatherforecast.R
-import com.example.testappweatherforecast.mvp.presentation.MainPresrnter
+import com.example.testappweatherforecast.mvp.presentation.MainPresenter
 import com.example.testappweatherforecast.mvp.ui.MainView
 import kotlinx.android.synthetic.main.activity_main.*
 import moxy.MvpAppCompatActivity
 import moxy.ktx.moxyPresenter
 
  class MainActivity : MvpAppCompatActivity(), MainView {
-     val myPresenter by moxyPresenter { MainPresrnter() }
+     val myPresenter by moxyPresenter { MainPresenter() }
 
      override fun onCreate(savedInstanceState: Bundle?) {
          super.onCreate(savedInstanceState)
@@ -28,6 +27,7 @@ import moxy.ktx.moxyPresenter
 
      override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,
          grantResults: IntArray) {
-         LocationService().handlePermissionsResult(requestCode, permissions, grantResults)
+         Toast.makeText(this,"6", Toast.LENGTH_LONG).show()
+         LocationService().handlePermissionsResult(requestCode, permissions, grantResults, this)
      }
  }
