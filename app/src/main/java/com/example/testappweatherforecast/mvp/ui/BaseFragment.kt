@@ -1,15 +1,19 @@
+@file:Suppress("DEPRECATION")
+
 package com.example.testappweatherforecast.mvp.ui
 
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import moxy.MvpAppCompatFragment
 
 /**
  * A simple [Fragment] subclass.
  */
-abstract class BaseFragment : Fragment() {
+@Suppress("DEPRECATION")
+abstract class BaseFragment : MvpAppCompatFragment() {
 
     abstract val layoutRes: Int
 
