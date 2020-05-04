@@ -3,8 +3,9 @@
 package com.example.testappweatherforecast.mvp.ui
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
+import android.view.View
 import com.example.testappweatherforecast.R
 import com.example.testappweatherforecast.mvp.entity.ForecastData
 import com.example.testappweatherforecast.mvp.presenter.today.TodayPresenter
@@ -23,6 +24,25 @@ class TodayFragment : BaseFragment(), TodayView{
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         sendForecastRequest()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        button.setOnClickListener {
+            val intent = Intent()
+            val textMessage: String = "Today in "+ this.cityCountry.text +
+                    " (temperature = " + this.temperatureWeather +
+                    ", humidity = " + this.humiditytTextView +
+                    ", precipitation = " + this.precipitationTextView +
+                    ", pressure = " + this.pressureTextView +
+                    ", wind speed = " + this.windSpeedTextView +
+                    ", wind direction = " + this.windDirectionTextView + ")"
+
+            intent.action = Intent.ACTION_SEND
+            intent.putExtra(Intent.EXTRA_TEXT, textMessage)
+            intent.type = "text/plain"
+            startActivity(Intent.createChooser(intent, "Share today forecast: "))
+        }
     }
 
     override fun sendForecastRequest() {
@@ -72,6 +92,11 @@ class TodayFragment : BaseFragment(), TodayView{
             in 3375 until 3600 -> "N"
             else -> "Error"
         }
+
+        //make data visible
+        progressBar2.visibility = View.INVISIBLE
+        containerView.visibility = View.VISIBLE
+
     }
 
 }

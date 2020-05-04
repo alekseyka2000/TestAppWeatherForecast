@@ -2,7 +2,7 @@ package com.example.testappweatherforecast.mvp.entity
 
 import com.google.gson.annotations.SerializedName
 
-data class WeatherList<T>(
+data class WeatherList(
 
 	@SerializedName("dt") val dt : Int,
 	@SerializedName("main") val main : Main,

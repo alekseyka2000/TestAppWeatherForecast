@@ -4,18 +4,22 @@ package com.example.testappweatherforecast.mvp.ui
 
 import android.os.Bundle
 import android.view.View
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.testappweatherforecast.R
-import com.example.testappweatherforecast.mvp.entity.ForecastData
+import com.example.testappweatherforecast.mvp.entity.WeatherList
+import com.example.testappweatherforecast.mvp.presenter.forecast.Adapter
 import com.example.testappweatherforecast.mvp.presenter.forecast.ForecastPresenter
 import com.example.testappweatherforecast.mvp.presenter.forecast.ForecastView
 import kotlinx.android.synthetic.main.fragment_forecast.*
 import moxy.ktx.moxyPresenter
 
 @Suppress("DEPRECATION")
-class ForecastFragment : BaseFragment(),
-    ForecastView {
+class ForecastFragment : BaseFragment(), ForecastView {
 
     private val myPresenter by moxyPresenter { ForecastPresenter() }
+    private lateinit var viewAdapter: RecyclerView.Adapter<*>
+    private var viewManager: RecyclerView.LayoutManager? = null
 
     override val layoutRes: Int
         get() = R.layout.fragment_forecast
@@ -27,13 +31,24 @@ class ForecastFragment : BaseFragment(),
 
     override fun sendForecastRequest() {
         myPresenter.getForecast(requireContext())
+        progressBar.visibility = View.INVISIBLE
+        recycleView.visibility = View.VISIBLE
     }
 
-    override fun setForecastFragment(forecast: ForecastData) {
-        city.setText(forecast.city.toString())
+    override fun setForecastFragment(weatherList: MutableList<Pair<WeatherList, Int>>) {
+        viewManager = LinearLayoutManager(activity)
+        viewAdapter = Adapter(weatherList, requireContext())
+        recycleView.apply {
+            setHasFixedSize(true)
+            layoutManager = viewManager
+            adapter = viewAdapter
+        }
     }
+
+
 
 }
+
 
 
 

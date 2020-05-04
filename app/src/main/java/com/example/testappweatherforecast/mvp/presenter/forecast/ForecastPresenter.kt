@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import com.example.testappweatherforecast.mvp.Service.ForecastService
 import com.example.testappweatherforecast.mvp.entity.ForecastData
+import com.example.testappweatherforecast.mvp.entity.WeatherList
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
@@ -61,8 +62,15 @@ class ForecastPresenter: MvpPresenter<ForecastView>(){
         }else Toast.makeText(context, "Check internet connection" , Toast.LENGTH_LONG).show()
     }
 
-    fun onShowForecast(forecast: ForecastData) {
-        viewState.setForecastFragment(forecast)
+    private fun onShowForecast(forecast: ForecastData) {
+        val forecastList = mutableListOf<Pair<WeatherList, Int>>()
+        if (forecast.list[0].dt_txt.takeLast(8)!= "00:00:00") forecastList.add(forecast.list[0] to 1)
+        for (weather in forecast.list){
+            if (weather.dt_txt.takeLast(8)=="00:00:00")
+                forecastList.add(weather to 2)
+            forecastList.add(weather to 3)
+        }
+        viewState.setForecastFragment(forecastList)
     }
 
     private val mLocationCallback = object : LocationCallback() {
@@ -71,7 +79,7 @@ class ForecastPresenter: MvpPresenter<ForecastView>(){
         }
     }
 
-    fun isNetworkAvailable(context: Context): Boolean {
+    private fun isNetworkAvailable(context: Context): Boolean {
         val connectivityManager =
             context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
         val activeNetworkInfo = connectivityManager!!.activeNetworkInfo
