@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.example.testappweatherforecast.R
+import com.example.testappweatherforecast.mvp.ui.forecast.ForecastFragment
 import kotlinx.android.synthetic.main.fragment_flow.*
 import moxy.MvpView
 
@@ -23,7 +24,8 @@ class FlowFragment : BaseFragment(), MvpView {
         currentFragment = savedInstanceState?.getString("CurrentFragment") ?: "one"
         if (savedInstanceState == null) {
             val todayFragment = TodayFragment()
-            val forecastFragment = ForecastFragment()
+            val forecastFragment =
+                ForecastFragment()
             childFragmentManager.inTransaction {
                 add(R.id.container, todayFragment, "one")
                 hide(todayFragment)

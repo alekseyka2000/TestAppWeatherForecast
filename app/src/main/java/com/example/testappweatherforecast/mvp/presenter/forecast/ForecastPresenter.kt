@@ -9,16 +9,21 @@ import android.net.ConnectivityManager
 import android.os.Looper
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import com.example.testappweatherforecast.mvp.Service.ForecastDao
+import com.example.testappweatherforecast.mvp.Service.ForecastRoomDB
 import com.example.testappweatherforecast.mvp.Service.ForecastService
+import com.example.testappweatherforecast.mvp.entity.ForecastDB
 import com.example.testappweatherforecast.mvp.entity.ForecastData
-import com.example.testappweatherforecast.mvp.entity.WeatherList
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import moxy.InjectViewState
 import moxy.MvpPresenter
 
@@ -26,7 +31,13 @@ import moxy.MvpPresenter
 @InjectViewState
 class ForecastPresenter: MvpPresenter<ForecastView>(){
 
+    private var db: ForecastRoomDB? = null
+    private var forecastDao: ForecastDao? = null
+
     fun getForecast(context: Context) {
+
+        db = ForecastRoomDB.getDatabase(context)
+        forecastDao = db?.forecastDao()
 
         val lastLocation = LocationService().getLocationRespond(context)
         fun onShowError(error: Throwable) {
@@ -43,7 +54,7 @@ class ForecastPresenter: MvpPresenter<ForecastView>(){
                                 .makeGetRequest(location.latitude.toString(), location.longitude.toString())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribeOn(Schedulers.io())
-                                .subscribe({response -> onShowForecast(response)}, {t -> onShowError(t) }))
+                                .subscribe({response -> onSetDB(response)}, {t -> onShowError(t) }))
                     }else{
                         val mLocationRequest = LocationRequest()
                         mLocationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
@@ -59,14 +70,46 @@ class ForecastPresenter: MvpPresenter<ForecastView>(){
                         )
                     }
                 }
-        }else Toast.makeText(context, "Check internet connection" , Toast.LENGTH_LONG).show()
+        }else{
+            Toast.makeText(context, "Check internet connection" , Toast.LENGTH_LONG).show()
+            var list = listOf<ForecastDB>()
+            GlobalScope.launch {
+                list = forecastDao?.getAll()!!
+                if(list!=null) onShowForecast(forecast = list)
+            }
+        }
     }
 
-    private fun onShowForecast(forecast: ForecastData) {
-        val forecastList = mutableListOf<Pair<WeatherList, Int>>()
-        if (forecast.list[0].dt_txt.takeLast(8)!= "00:00:00") forecastList.add(forecast.list[0] to 1)
-        for (weather in forecast.list){
-            if (weather.dt_txt.takeLast(8)=="00:00:00")
+    private fun onSetDB(forecast: ForecastData){
+        var list = listOf<ForecastDB>()
+        GlobalScope.launch {
+            db?.forecastDao()?.deleteAll()
+            var insertDB = ForecastDB()
+            insertDB.city = forecast.city.name
+            insertDB.country = forecast.city.country
+            for(listItem in forecast.list){
+                insertDB.temp = listItem.main.temp
+                insertDB.humidity = listItem.main.humidity
+                insertDB.pressure = listItem.main.pressure
+                insertDB.speed = listItem.wind.speed
+                insertDB.deg = listItem.wind.deg
+                insertDB.dtTxt = listItem.dt_txt
+                insertDB.description = listItem.weather[0].description
+                insertDB.icon = listItem.weather[0].icon
+                insertDB.main = listItem.weather[0].main
+                db?.forecastDao()?.insert(insertDB)
+            }
+
+            list = forecastDao?.getAll()!!
+            if(list!=null) onShowForecast(forecast = list)
+        }
+    }
+
+    private fun onShowForecast(forecast: List<ForecastDB>) {
+        val forecastList = mutableListOf<Pair<ForecastDB, Int>>()
+       if (forecast!![0].dtTxt.takeLast(8)!= "00:00:00") forecastList.add(forecast[0] to 1)
+        for (weather in forecast){
+            if (weather.dtTxt.takeLast(8)=="00:00:00")
                 forecastList.add(weather to 2)
             forecastList.add(weather to 3)
         }

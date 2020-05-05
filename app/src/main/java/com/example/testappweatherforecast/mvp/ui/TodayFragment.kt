@@ -7,7 +7,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import com.example.testappweatherforecast.R
-import com.example.testappweatherforecast.mvp.entity.ForecastData
+import com.example.testappweatherforecast.mvp.entity.ForecastDB
 import com.example.testappweatherforecast.mvp.presenter.today.TodayPresenter
 import com.example.testappweatherforecast.mvp.presenter.today.TodayView
 import kotlinx.android.synthetic.main.fragment_today.*
@@ -31,12 +31,12 @@ class TodayFragment : BaseFragment(), TodayView{
         button.setOnClickListener {
             val intent = Intent()
             val textMessage: String = "Today in "+ this.cityCountry.text +
-                    " (temperature = " + this.temperatureWeather +
-                    ", humidity = " + this.humiditytTextView +
-                    ", precipitation = " + this.precipitationTextView +
-                    ", pressure = " + this.pressureTextView +
-                    ", wind speed = " + this.windSpeedTextView +
-                    ", wind direction = " + this.windDirectionTextView + ")"
+                    " (temperature = " + this.temperatureWeather.text +
+                    ", humidity = " + this.humiditytTextView.text +
+                    ", precipitation = " + this.precipitationTextView.text +
+                    ", pressure = " + this.pressureTextView.text +
+                    ", wind speed = " + this.windSpeedTextView.text +
+                    ", wind direction = " + this.windDirectionTextView.text + ")"
 
             intent.action = Intent.ACTION_SEND
             intent.putExtra(Intent.EXTRA_TEXT, textMessage)
@@ -50,23 +50,23 @@ class TodayFragment : BaseFragment(), TodayView{
     }
 
     @SuppressLint("DefaultLocale", "SetTextI18n")
-    override fun setTodayFragment(forecast: ForecastData) {
+    override fun setTodayFragment(forecast: List<ForecastDB>) {
 
         //set weather image
         context?.packageName
         weatherView.setImageDrawable(resources.getDrawable(resources
-            .getIdentifier(("pic"+forecast.list[0].weather[0].icon),  "drawable", context?.packageName)) )
+            .getIdentifier(("pic"+forecast[0].icon),  "drawable", context?.packageName)) )
 
         //set city text
-        val country = if (forecast.city.country == "none") "" else (", " + forecast.city.country)
-        cityCountry.text = (forecast.city.name + country)
+        val country = if (forecast[0].country == "none") "" else (", " + forecast[0].country)
+        cityCountry.text = (forecast[0].city + country)
 
         //set temperature text
-        temperatureWeather.text = ((forecast.list[0].main.temp - 273).toInt().toString() + " ℃ | "
-                + forecast.list[0].weather[0].description.capitalize())
+        temperatureWeather.text = ((forecast[0].temp - 273).toInt().toString() + " ℃ | "
+                + forecast[0].description.capitalize())
 
         //set humidity text
-        humiditytTextView.text = (forecast.list[0].main.humidity.toString()+" %")
+        humiditytTextView.text = (forecast[0].humidity.toString()+" %")
 
         //set precipitation text
         //used API is'n share precipitation value/ so will be use default value 1 !!!!!
@@ -74,13 +74,13 @@ class TodayFragment : BaseFragment(), TodayView{
 
         //set pressure text
         // incorrect icon for that value!!!!!!!!!!
-        pressureTextView.text = forecast.list[0].main.pressure.toString()+" hPa"
+        pressureTextView.text = forecast[0].pressure.toString()+" hPa"
 
         //set wind speed text
-        windSpeedTextView.text = forecast.list[0].wind.speed.toString()+" km/h"
+        windSpeedTextView.text = forecast[0].speed.toString()+" km/h"
 
         //set wind direction text
-        windDirectionTextView.text = when(forecast.list[0].wind.deg*10){
+        windDirectionTextView.text = when(forecast[0].deg*10){
             in 0 until 225 -> "N"
             in 225 until 675 -> "NE"
             in 675 until 1125 -> "E"

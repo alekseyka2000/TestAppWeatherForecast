@@ -1,4 +1,4 @@
-package com.example.testappweatherforecast.mvp.presenter.forecast
+package com.example.testappweatherforecast.mvp.ui.forecast
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -10,10 +10,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.testappweatherforecast.R
-import com.example.testappweatherforecast.mvp.entity.WeatherList
+import com.example.testappweatherforecast.mvp.entity.ForecastDB
 import java.util.*
 
-class Adapter(private val weatherList: List<Pair<WeatherList, Int>>, con: Context) :
+class Adapter(private val weatherList: List<Pair<ForecastDB, Int>>, con: Context) :
     RecyclerView.Adapter<Adapter.BaseViewHolder>(){
 
     private val context = con
@@ -69,11 +69,11 @@ class Adapter(private val weatherList: List<Pair<WeatherList, Int>>, con: Contex
         private val weather : TextView = itemView.findViewById(R.id.weatherForecastItemTextView)
         private val temperature : TextView = itemView.findViewById(R.id.temperatureForecastItemTextView)
 
-        override fun bind(item: WeatherList){
-            image.setImageDrawable(getDrawableForIcon(item.weather[0].icon))
-            time.text = item.dt_txt.takeLast(8).take(5)
-            weather.text = item.weather[0].main
-            temperature.text = (item.main.temp.toInt()-273).toString()
+        override fun bind(item: ForecastDB){
+            image.setImageDrawable(getDrawableForIcon(item.icon))
+            time.text = item.dtTxt.takeLast(8).take(5)
+            weather.text = item.main
+            temperature.text = (item.temp.toInt()-273).toString()
         }
     }
 
@@ -81,12 +81,12 @@ class Adapter(private val weatherList: List<Pair<WeatherList, Int>>, con: Contex
         private val weekDay: TextView = itemView.findViewById(R.id.dayOfWeekTextView)
 
         @SuppressLint("SetTextI18n")
-        override fun bind(item: WeatherList){
+        override fun bind(item: ForecastDB){
 
             val c = Calendar.getInstance()
-            c.set(item.dt_txt.take(2).toInt(),
-                item.dt_txt.take(7).takeLast(2).toInt(),
-                item.dt_txt.take(10).takeLast(2).toInt())
+            c.set(item.dtTxt.take(2).toInt(),
+                item.dtTxt.take(7).takeLast(2).toInt(),
+                item.dtTxt.take(10).takeLast(2).toInt())
 
             when (c.get(Calendar.DAY_OF_MONTH)) {
                 Calendar.SUNDAY -> weekDay.text = "Sunday"
@@ -105,12 +105,12 @@ class Adapter(private val weatherList: List<Pair<WeatherList, Int>>, con: Contex
         private val weekDay: TextView = itemView.findViewById(R.id.dayOfWeekTextView)
 
         @SuppressLint("SetTextI18n")
-        override fun bind(item: WeatherList) {
+        override fun bind(item: ForecastDB) {
             weekDay.text = "Today"
         }
     }
 
     abstract class BaseViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        abstract fun bind(item: WeatherList)
+        abstract fun bind(item: ForecastDB)
     }
 }

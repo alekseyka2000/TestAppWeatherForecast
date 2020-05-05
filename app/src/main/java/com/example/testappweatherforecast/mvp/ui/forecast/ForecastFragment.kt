@@ -1,16 +1,16 @@
 @file:Suppress("DEPRECATION")
 
-package com.example.testappweatherforecast.mvp.ui
+package com.example.testappweatherforecast.mvp.ui.forecast
 
 import android.os.Bundle
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.testappweatherforecast.R
-import com.example.testappweatherforecast.mvp.entity.WeatherList
-import com.example.testappweatherforecast.mvp.presenter.forecast.Adapter
+import com.example.testappweatherforecast.mvp.entity.ForecastDB
 import com.example.testappweatherforecast.mvp.presenter.forecast.ForecastPresenter
 import com.example.testappweatherforecast.mvp.presenter.forecast.ForecastView
+import com.example.testappweatherforecast.mvp.ui.BaseFragment
 import kotlinx.android.synthetic.main.fragment_forecast.*
 import moxy.ktx.moxyPresenter
 
@@ -35,9 +35,12 @@ class ForecastFragment : BaseFragment(), ForecastView {
         recycleView.visibility = View.VISIBLE
     }
 
-    override fun setForecastFragment(weatherList: MutableList<Pair<WeatherList, Int>>) {
+    override fun setForecastFragment(weatherList: MutableList<Pair<ForecastDB, Int>>) {
         viewManager = LinearLayoutManager(activity)
-        viewAdapter = Adapter(weatherList, requireContext())
+        viewAdapter = Adapter(
+            weatherList,
+            requireContext()
+        )
         recycleView.apply {
             setHasFixedSize(true)
             layoutManager = viewManager

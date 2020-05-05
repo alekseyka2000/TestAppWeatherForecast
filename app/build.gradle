@@ -6,8 +6,6 @@ apply plugin: 'kotlin-android-extensions'
 
 apply plugin: 'kotlin-kapt'
 
-apply plugin: 'io.objectbox'
-
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.3"
@@ -63,8 +61,9 @@ dependencies {
     //bottom navigation
     implementation 'androidx.navigation:navigation-fragment:2.2.2'
     implementation 'androidx.navigation:navigation-ui:2.2.2'
-    //objectBox
-    implementation 'io.objectbox:objectbox-kotlin:2.3.3'
-    implementation 'io.objectbox:objectbox-android:2.3.3'
-    kapt 'io.objectbox:objectbox-processor:2.3.3'
+    //Room
+    implementation 'androidx.room:room-runtime:2.2.5'
+    annotationProcessor 'androidx.room:room-compiler:2.2.5'
+    implementation 'androidx.room:room-ktx:2.2.5'
+    kapt 'androidx.room:room-compiler:2.2.5'
 }

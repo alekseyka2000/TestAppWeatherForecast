@@ -3,7 +3,6 @@ package com.example.testappweatherforecast.mvp.entity
 import com.google.gson.annotations.SerializedName
 
 data class ForecastData (
-
     @SerializedName("cod") val cod : Int,
     @SerializedName("message") val message : Double,
     @SerializedName("cnt") val cnt : Int,
