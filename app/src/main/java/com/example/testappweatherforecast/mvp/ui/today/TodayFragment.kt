@@ -1,20 +1,22 @@
 @file:Suppress("DEPRECATION")
 
-package com.example.testappweatherforecast.mvp.ui
+package com.example.testappweatherforecast.mvp.ui.today
 
-import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.IntentFilter
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.view.View
 import com.example.testappweatherforecast.R
-import com.example.testappweatherforecast.mvp.entity.ForecastDB
+import com.example.testappweatherforecast.mvp.entity.TodayDB
 import com.example.testappweatherforecast.mvp.presenter.today.TodayPresenter
 import com.example.testappweatherforecast.mvp.presenter.today.TodayView
+import com.example.testappweatherforecast.mvp.ui.BaseFragment
 import kotlinx.android.synthetic.main.fragment_today.*
 import moxy.ktx.moxyPresenter
 
 @Suppress("DEPRECATION")
-class TodayFragment : BaseFragment(), TodayView{
+class TodayFragment : BaseFragment(), TodayView, TodayConnectivityReceiver.TodayConnectivityReceiverListener {
 
     private val myPresenter by moxyPresenter { TodayPresenter() }
 
@@ -24,6 +26,7 @@ class TodayFragment : BaseFragment(), TodayView{
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         sendForecastRequest()
+        activity?.registerReceiver(TodayConnectivityReceiver(), IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
     }
 
     override fun onStart() {
@@ -45,12 +48,16 @@ class TodayFragment : BaseFragment(), TodayView{
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        TodayConnectivityReceiver.todayConnectivityReceiverListener = this
+    }
+
     override fun sendForecastRequest() {
         myPresenter.getForecast(requireContext())
     }
 
-    @SuppressLint("DefaultLocale", "SetTextI18n")
-    override fun setTodayFragment(forecast: List<ForecastDB>) {
+    override fun setTodayFragment(forecast: List<TodayDB>) {
 
         //set weather image
         context?.packageName
@@ -96,6 +103,17 @@ class TodayFragment : BaseFragment(), TodayView{
         //make data visible
         progressBar2.visibility = View.INVISIBLE
         containerView.visibility = View.VISIBLE
+
+    }
+
+    override fun onNetworkConnectionChanged(isConnected: Boolean) {
+        showNetworkMessage(isConnected)
+    }
+
+    private fun showNetworkMessage(isConnected: Boolean) {
+        if (isConnected) {sendForecastRequest()
+
+        }
 
     }
 

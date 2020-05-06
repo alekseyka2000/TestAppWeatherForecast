@@ -1,4 +1,4 @@
-package com.example.testappweatherforecast.mvp.Service
+package com.example.testappweatherforecast.mvp.Service.ForecastDBd
 
 import android.content.Context
 import androidx.room.Database
@@ -12,13 +12,13 @@ public abstract class ForecastRoomDB: RoomDatabase() {
     abstract fun forecastDao(): ForecastDao
 
     companion object {
-        // Singleton prevents multiple instances of database opening at the
-        // same time.
+
         @Volatile
         private var INSTANCE: ForecastRoomDB? = null
 
         fun getDatabase(context: Context): ForecastRoomDB {
-            val tempInstance = INSTANCE
+            val tempInstance =
+                INSTANCE
             if (tempInstance != null) {
                 return tempInstance
             }
@@ -31,10 +31,6 @@ public abstract class ForecastRoomDB: RoomDatabase() {
                 INSTANCE = instance
                 return instance
             }
-        }
-
-        fun destroyDataBase(){
-            INSTANCE = null
         }
     }
 }

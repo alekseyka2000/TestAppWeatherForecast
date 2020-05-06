@@ -1,4 +1,4 @@
-package com.example.testappweatherforecast.mvp.Service
+package com.example.testappweatherforecast.mvp.Service.ForecastDBd
 
 import androidx.room.Dao
 import androidx.room.Insert

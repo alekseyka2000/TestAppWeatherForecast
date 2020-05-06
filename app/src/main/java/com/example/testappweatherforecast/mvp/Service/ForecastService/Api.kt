@@ -1,4 +1,4 @@
-package com.example.testappweatherforecast.mvp.Service
+package com.example.testappweatherforecast.mvp.Service.ForecastService
 
 import com.example.testappweatherforecast.mvp.entity.ForecastData
 import io.reactivex.Observable

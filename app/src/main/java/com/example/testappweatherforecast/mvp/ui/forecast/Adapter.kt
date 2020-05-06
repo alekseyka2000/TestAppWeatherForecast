@@ -23,15 +23,15 @@ class Adapter(private val weatherList: List<Pair<ForecastDB, Int>>, con: Context
         return when(viewType){
             R.layout.day_of_week_item ->{
                 val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.day_of_week_item, parent, false)
+                    .inflate(R.layout.day_of_week_item, parent, false)
                 DayOfWeekViewHolder(view)}
             R.layout.forecast_item ->{
                 val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.forecast_item, parent, false)
+                    .inflate(R.layout.forecast_item, parent, false)
                 ForecastViewHolder(view)}
             else -> {
                 val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.day_of_week_item, parent, false)
+                    .inflate(R.layout.day_of_week_item, parent, false)
                 TodayViewHolder(view)}
         }
 

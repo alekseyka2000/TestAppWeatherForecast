@@ -9,11 +9,11 @@ import android.net.ConnectivityManager
 import android.os.Looper
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import com.example.testappweatherforecast.mvp.Service.ForecastDao
-import com.example.testappweatherforecast.mvp.Service.ForecastRoomDB
-import com.example.testappweatherforecast.mvp.Service.ForecastService
-import com.example.testappweatherforecast.mvp.entity.ForecastDB
+import com.example.testappweatherforecast.mvp.Service.ForecastService.ForecastService
+import com.example.testappweatherforecast.mvp.Service.TodayDB.TodayDao
+import com.example.testappweatherforecast.mvp.Service.TodayDB.TodayRoomDB
 import com.example.testappweatherforecast.mvp.entity.ForecastData
+import com.example.testappweatherforecast.mvp.entity.TodayDB
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
@@ -21,8 +21,10 @@ import com.google.android.gms.location.LocationServices
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import moxy.InjectViewState
 import moxy.MvpPresenter
 
@@ -30,13 +32,13 @@ import moxy.MvpPresenter
 @InjectViewState
 class TodayPresenter: MvpPresenter<TodayView>(){
 
-    private var db: ForecastRoomDB? = null
-    private var forecastDao: ForecastDao? = null
+    private var db: TodayRoomDB? = null
+    private var todayDao: TodayDao? = null
 
     fun getForecast(context: Context) {
 
-        db = ForecastRoomDB.getDatabase(context)
-        forecastDao = db?.forecastDao()
+        db = TodayRoomDB.getDatabase(context)
+        todayDao = db?.todayDao()
 
         val lastLocation = LocationService().getLocationRespond(context)
         fun onShowError(error: Throwable) {
@@ -70,20 +72,27 @@ class TodayPresenter: MvpPresenter<TodayView>(){
                     }
                 }
         }else{
-            Toast.makeText(context, "Check internet connection" , Toast.LENGTH_LONG).show()
-            var list = listOf<ForecastDB>()
+            var list = listOf<TodayDB>()
             GlobalScope.launch {
-                list = forecastDao?.getAll()!!
-                if(list!=null) onShowForecast(forecast = list)
+                list = db?.todayDao()?.getAll()!!
+                withContext(Dispatchers.Main) {
+                    if(list.isEmpty()){
+                        Toast.makeText(context, "Forecast data is not your device, turn on the Internet for start work" , Toast.LENGTH_LONG).show()
+                    }else{
+                        Toast.makeText(context, "Check internet connection" , Toast.LENGTH_LONG).show()
+                        onShowForecast(forecast = list)
+                    }
+                }
             }
+
         }
     }
 
     private fun onSetDB(forecast: ForecastData){
-        var list = listOf<ForecastDB>()
+        var list = listOf<TodayDB>()
         GlobalScope.launch {
-            db?.forecastDao()?.deleteAll()
-            var insertDB = ForecastDB()
+            db?.todayDao()?.deleteAll()
+            var insertDB = TodayDB()
             insertDB.city = forecast.city.name
             insertDB.country = forecast.city.country
             for(listItem in forecast.list){
@@ -96,15 +105,18 @@ class TodayPresenter: MvpPresenter<TodayView>(){
                 insertDB.description = listItem.weather[0].description
                 insertDB.icon = listItem.weather[0].icon
                 insertDB.main = listItem.weather[0].main
-                db?.forecastDao()?.insert(insertDB)
+                db?.todayDao()?.insert(insertDB)
             }
 
-            list = forecastDao?.getAll()!!
-            if(list!=null) onShowForecast(forecast = list)
+            list = db?.todayDao()?.getAll()!!
+            withContext(Dispatchers.Main) {
+                onShowForecast(forecast = list)
+            }
         }
+
     }
 
-    private fun onShowForecast(forecast: List<ForecastDB>) {
+    private fun onShowForecast(forecast: List<TodayDB>) {
         viewState.setTodayFragment(forecast)
     }
 

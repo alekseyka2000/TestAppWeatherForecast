@@ -2,6 +2,8 @@
 
 package com.example.testappweatherforecast.mvp.ui.forecast
 
+import android.content.IntentFilter
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,7 +17,7 @@ import kotlinx.android.synthetic.main.fragment_forecast.*
 import moxy.ktx.moxyPresenter
 
 @Suppress("DEPRECATION")
-class ForecastFragment : BaseFragment(), ForecastView {
+class ForecastFragment : BaseFragment(), ForecastView, ForecastConnectivityReceiver.ForecastConnectivityReceiverListener {
 
     private val myPresenter by moxyPresenter { ForecastPresenter() }
     private lateinit var viewAdapter: RecyclerView.Adapter<*>
@@ -27,12 +29,16 @@ class ForecastFragment : BaseFragment(), ForecastView {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         sendForecastRequest()
+        getActivity()?.registerReceiver(ForecastConnectivityReceiver(), IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
+    }
+
+    override fun onResume() {
+        super.onResume()
+        ForecastConnectivityReceiver.forecastConnectivityReceiverListener = this
     }
 
     override fun sendForecastRequest() {
         myPresenter.getForecast(requireContext())
-        progressBar.visibility = View.INVISIBLE
-        recycleView.visibility = View.VISIBLE
     }
 
     override fun setForecastFragment(weatherList: MutableList<Pair<ForecastDB, Int>>) {
@@ -46,10 +52,17 @@ class ForecastFragment : BaseFragment(), ForecastView {
             layoutManager = viewManager
             adapter = viewAdapter
         }
+        progressBar.visibility = View.INVISIBLE
+        recycleView.visibility = View.VISIBLE
     }
 
+    override fun onNetworkConnectionChanged(isConnected: Boolean) {
+        showNetworkMessage(isConnected)
+    }
 
-
+    private fun showNetworkMessage(isConnected: Boolean) {
+        if (isConnected) sendForecastRequest()
+    }
 }
 
 

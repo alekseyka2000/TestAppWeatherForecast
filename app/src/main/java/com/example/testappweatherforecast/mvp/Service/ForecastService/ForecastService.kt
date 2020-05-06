@@ -1,4 +1,4 @@
-package com.example.testappweatherforecast.mvp.Service
+package com.example.testappweatherforecast.mvp.Service.ForecastService
 
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.Retrofit
@@ -12,7 +12,7 @@ object ForecastService {
             .build()
             .create(Api::class.java)
 
-    fun makeGetRequest(): Api{
+    fun makeGetRequest(): Api {
        return api
     }
 

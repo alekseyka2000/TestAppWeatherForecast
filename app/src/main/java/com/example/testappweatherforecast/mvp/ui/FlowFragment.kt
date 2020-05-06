@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.example.testappweatherforecast.R
 import com.example.testappweatherforecast.mvp.ui.forecast.ForecastFragment
+import com.example.testappweatherforecast.mvp.ui.today.TodayFragment
 import kotlinx.android.synthetic.main.fragment_flow.*
 import moxy.MvpView
 
