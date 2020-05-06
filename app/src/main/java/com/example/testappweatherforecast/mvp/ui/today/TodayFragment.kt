@@ -2,6 +2,7 @@
 
 package com.example.testappweatherforecast.mvp.ui.today
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.ConnectivityManager
@@ -57,6 +58,7 @@ class TodayFragment : BaseFragment(), TodayView, TodayConnectivityReceiver.Today
         myPresenter.getForecast(requireContext())
     }
 
+    @SuppressLint("DefaultLocale", "SetTextI18n")
     override fun setTodayFragment(forecast: List<TodayDB>) {
 
         //set weather image
