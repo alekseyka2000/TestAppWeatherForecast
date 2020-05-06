@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import com.example.testappweatherforecast.mvp.entity.TodayDB
 
 @Database(entities = arrayOf(TodayDB::class), version = 1, exportSchema = false)
-public abstract class TodayRoomDB: RoomDatabase() {
+abstract class TodayRoomDB: RoomDatabase() {
 
     abstract fun todayDao(): TodayDao
 

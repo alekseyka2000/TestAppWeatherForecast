@@ -5,7 +5,7 @@ import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 
 object ForecastService {
-    val api = Retrofit.Builder()
+    private val api = Retrofit.Builder()
             .baseUrl("https://samples.openweathermap.org/data/2.5/")
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(GsonConverterFactory.create())

@@ -1,5 +1,6 @@
 package com.example.testappweatherforecast.mvp.ui.forecast
 
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -8,6 +9,7 @@ import android.net.ConnectivityManager
 @Suppress("DEPRECATION")
 class ForecastConnectivityReceiver: BroadcastReceiver() {
 
+    @SuppressLint("UnsafeProtectedBroadcastReceiver")
     override fun onReceive(context: Context?, intent: Intent?) {
 
         if (forecastConnectivityReceiverListener != null) {

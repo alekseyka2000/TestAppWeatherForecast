@@ -69,7 +69,7 @@ class ForecastPresenter: MvpPresenter<ForecastView>(){
                     }
                 }
         }else{
-            var list = listOf<ForecastDB>()
+            var list: List<ForecastDB>
             GlobalScope.launch {
                 list = dbForecast?.forecastDao()?.getAll()!!
                 withContext(Dispatchers.Main) {
@@ -85,10 +85,10 @@ class ForecastPresenter: MvpPresenter<ForecastView>(){
     }
 
     private fun onSetDB(forecast: ForecastData){
-        var list = listOf<ForecastDB>()
+        var list: List<ForecastDB>
         GlobalScope.launch {
             dbForecast?.forecastDao()?.deleteAll()
-            var insertDB = ForecastDB()
+            val insertDB = ForecastDB()
             insertDB.city = forecast.city.name
             insertDB.country = forecast.city.country
             for(listItem in forecast.list){
@@ -114,7 +114,7 @@ class ForecastPresenter: MvpPresenter<ForecastView>(){
 
     private fun onShowForecast(forecast: List<ForecastDB>) {
         val forecastList = mutableListOf<Pair<ForecastDB, Int>>()
-        if (forecast!![0].dtTxt.takeLast(8)!= "00:00:00") forecastList.add(forecast[0] to 1)
+        if (forecast[0].dtTxt.takeLast(8)!= "00:00:00") forecastList.add(forecast[0] to 1)
         for (weather in forecast){
             if (weather.dtTxt.takeLast(8)=="00:00:00")
                 forecastList.add(weather to 2)

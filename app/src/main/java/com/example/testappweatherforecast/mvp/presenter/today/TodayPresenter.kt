@@ -72,7 +72,7 @@ class TodayPresenter: MvpPresenter<TodayView>(){
                     }
                 }
         }else{
-            var list = listOf<TodayDB>()
+            var list: List<TodayDB>
             GlobalScope.launch {
                 list = db?.todayDao()?.getAll()!!
                 withContext(Dispatchers.Main) {
@@ -89,10 +89,10 @@ class TodayPresenter: MvpPresenter<TodayView>(){
     }
 
     private fun onSetDB(forecast: ForecastData){
-        var list = listOf<TodayDB>()
+        var list: List<TodayDB>
         GlobalScope.launch {
             db?.todayDao()?.deleteAll()
-            var insertDB = TodayDB()
+            val insertDB = TodayDB()
             insertDB.city = forecast.city.name
             insertDB.country = forecast.city.country
             for(listItem in forecast.list){
