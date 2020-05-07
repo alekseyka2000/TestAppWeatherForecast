@@ -9,4 +9,5 @@ import moxy.viewstate.strategy.StateStrategyType
 interface ForecastView: MvpView{
     fun sendForecastRequest()
     fun setForecastFragment(weatherList: MutableList<Pair<ForecastDB, Int>>)
+    fun requestPermissions()
 }

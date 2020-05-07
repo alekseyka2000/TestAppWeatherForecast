@@ -88,7 +88,7 @@ class Adapter(private val weatherList: List<Pair<ForecastDB, Int>>, con: Context
                 item.dtTxt.take(7).takeLast(2).toInt(),
                 item.dtTxt.take(10).takeLast(2).toInt())
 
-            when (c.get(Calendar.DAY_OF_MONTH)) {
+            when (c.get(Calendar.DAY_OF_WEEK)) {
                 Calendar.SUNDAY -> weekDay.text = "Sunday"
                 Calendar.MONDAY -> weekDay.text = "Monday"
                 Calendar.TUESDAY -> weekDay.text = "Tuesday"

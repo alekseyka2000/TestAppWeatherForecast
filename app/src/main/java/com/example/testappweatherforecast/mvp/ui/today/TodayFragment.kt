@@ -2,12 +2,19 @@
 
 package com.example.testappweatherforecast.mvp.ui.today
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat.checkSelfPermission
 import com.example.testappweatherforecast.R
 import com.example.testappweatherforecast.mvp.entity.TodayDB
 import com.example.testappweatherforecast.mvp.presenter.today.TodayPresenter
@@ -24,10 +31,10 @@ class TodayFragment : BaseFragment(), TodayView, TodayConnectivityReceiver.Today
     override val layoutRes: Int
         get() = R.layout.fragment_today
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         sendForecastRequest()
-        activity?.registerReceiver(TodayConnectivityReceiver(), IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
+        requireContext().registerReceiver(TodayConnectivityReceiver(), IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
     }
 
     override fun onStart() {
@@ -113,10 +120,26 @@ class TodayFragment : BaseFragment(), TodayView, TodayConnectivityReceiver.Today
     }
 
     private fun showNetworkMessage(isConnected: Boolean) {
-        if (isConnected) {sendForecastRequest()
-
+        if (isConnected) {
+            sendForecastRequest()
         }
-
     }
 
+    override fun requestPermissions(){
+        requestPermissions(
+            arrayOf( Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION), 200)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray)
+    {
+        if (requestCode == 200) {
+            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                myPresenter.getForecast(requireContext())
+            }
+        }
+    }
 }

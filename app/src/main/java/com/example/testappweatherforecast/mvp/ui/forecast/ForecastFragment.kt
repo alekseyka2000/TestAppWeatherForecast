@@ -2,10 +2,15 @@
 
 package com.example.testappweatherforecast.mvp.ui.forecast
 
+import android.Manifest
+import android.content.Context
 import android.content.IntentFilter
+import android.content.pm.PackageManager
+import android.location.LocationManager
 import android.net.ConnectivityManager
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.testappweatherforecast.R
@@ -43,10 +48,7 @@ class ForecastFragment : BaseFragment(), ForecastView, ForecastConnectivityRecei
 
     override fun setForecastFragment(weatherList: MutableList<Pair<ForecastDB, Int>>) {
         viewManager = LinearLayoutManager(activity)
-        viewAdapter = Adapter(
-            weatherList,
-            requireContext()
-        )
+        viewAdapter = Adapter(weatherList, requireContext())
         recycleView.apply {
             setHasFixedSize(true)
             layoutManager = viewManager
@@ -62,6 +64,24 @@ class ForecastFragment : BaseFragment(), ForecastView, ForecastConnectivityRecei
 
     private fun showNetworkMessage(isConnected: Boolean) {
         if (isConnected) sendForecastRequest()
+    }
+
+    override fun requestPermissions(){
+        requestPermissions(
+            arrayOf( Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION), 200)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray)
+    {
+        if (requestCode == 200) {
+            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                myPresenter.getForecast(requireContext())
+            }
+        }
     }
 }
 

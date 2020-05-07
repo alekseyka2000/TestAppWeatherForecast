@@ -3,6 +3,7 @@
 package com.example.testappweatherforecast.mvp.ui
 
 import android.os.Bundle
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.example.testappweatherforecast.R
@@ -15,6 +16,8 @@ import moxy.MvpView
 class FlowFragment : BaseFragment(), MvpView {
 
     private var currentFragment: String? = null
+    private val todayFragment = TodayFragment()
+    private val forecastFragment = ForecastFragment()
 
     override val layoutRes: Int
         get() = R.layout.fragment_flow
@@ -24,9 +27,6 @@ class FlowFragment : BaseFragment(), MvpView {
 
         currentFragment = savedInstanceState?.getString("CurrentFragment") ?: "one"
         if (savedInstanceState == null) {
-            val todayFragment = TodayFragment()
-            val forecastFragment =
-                ForecastFragment()
             childFragmentManager.inTransaction {
                 add(R.id.container, todayFragment, "one")
                 hide(todayFragment)
@@ -65,6 +65,14 @@ class FlowFragment : BaseFragment(), MvpView {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putString("CurrentFragment", currentFragment)
+    }
+
+    fun getForecastFragment():ForecastFragment{
+        return forecastFragment
+    }
+
+    fun getTodayFragment(): TodayFragment {
+        return todayFragment
     }
 }
 

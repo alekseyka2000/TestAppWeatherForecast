@@ -1,14 +1,16 @@
 package com.example.testappweatherforecast.mvp.presenter.forecast
 
-import LocationService
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
+import android.location.LocationManager
 import android.net.ConnectivityManager
 import android.os.Looper
+import android.provider.Settings
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.example.testappweatherforecast.mvp.Service.ForecastDBd.ForecastDao
 import com.example.testappweatherforecast.mvp.Service.ForecastDBd.ForecastRoomDB
 import com.example.testappweatherforecast.mvp.Service.ForecastService.ForecastService
@@ -21,7 +23,10 @@ import com.google.android.gms.location.LocationServices
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import moxy.InjectViewState
 import moxy.MvpPresenter
 
@@ -37,54 +42,66 @@ class ForecastPresenter: MvpPresenter<ForecastView>(){
         dbForecast = ForecastRoomDB.getDatabase(context)
         forecastDao = dbForecast?.forecastDao()
 
-        val lastLocation = LocationService().getLocationRespond(context)
+        val mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+        val lastLocation = mFusedLocationClient!!.lastLocation
+
         fun onShowError(error: Throwable) {
             Toast.makeText(context, error.message , Toast.LENGTH_LONG).show()
         }
-        if (isNetworkAvailable(context)){
-            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.INTERNET)
-                == PackageManager.PERMISSION_GRANTED)
-                lastLocation.addOnCompleteListener { task ->
-                    val location: Location? = task.result
-                    if (location!= null) {
-                        CompositeDisposable().add(
-                            ForecastService.makeGetRequest()
-                                .makeGetRequest(location.latitude.toString(), location.longitude.toString())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribeOn(Schedulers.io())
-                                .subscribe({response -> onSetDB(response)}, {t -> onShowError(t) }))
-                    }else{
-                        val mLocationRequest = LocationRequest()
-                        mLocationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-                        mLocationRequest.interval = 0
-                        mLocationRequest.fastestInterval = 0
-                        mLocationRequest.numUpdates = 1
+        if(checkPermissions(context)){
+            if (isLocationEnable(context)){
+                if (isNetworkAvailable(context)){
+                    if (ContextCompat.checkSelfPermission(context, Manifest.permission.INTERNET)
+                        == PackageManager.PERMISSION_GRANTED)
+                        lastLocation.addOnCompleteListener { task ->
+                            val location: Location? = task.result
+                            if (location!= null) {
+                                CompositeDisposable().add(
+                                    ForecastService.makeGetRequest()
+                                        .makeGetRequest(location.latitude.toString(), location.longitude.toString())
+                                        .observeOn(AndroidSchedulers.mainThread())
+                                        .subscribeOn(Schedulers.io())
+                                        .subscribe({response -> onSetForecastDB(response)}, {t -> onShowError(t) }))
+                            }else{
+                                val mLocationRequest = LocationRequest()
+                                mLocationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+                                mLocationRequest.interval = 0
+                                mLocationRequest.fastestInterval = 0
+                                mLocationRequest.numUpdates = 1
 
-                        val locationClient = LocationServices
-                            .getFusedLocationProviderClient(context)
-                        locationClient!!.requestLocationUpdates(
-                            mLocationRequest, mLocationCallback,
-                            Looper.myLooper()
-                        )
+                                val locationClient = LocationServices
+                                    .getFusedLocationProviderClient(context)
+                                locationClient!!.requestLocationUpdates(
+                                    mLocationRequest, mLocationCallback,
+                                    Looper.myLooper()
+                                )
+                            }
+                        }
+                }else{
+                    var list: List<ForecastDB>
+                    GlobalScope.launch {
+                        list = dbForecast?.forecastDao()?.getAll()!!
+                        withContext(Dispatchers.Main) {
+                            if(list.isEmpty()){
+                                Toast.makeText(context, "Forecast data is not your device, turn on the Internet for start work" , Toast.LENGTH_LONG).show()
+                            }else{
+                                Toast.makeText(context, "Check internet connection" , Toast.LENGTH_LONG).show()
+                                onShowForecast(forecast = list)
+                            }
+                        }
                     }
+
                 }
-        }else{
-            var list: List<ForecastDB>
-            GlobalScope.launch {
-                list = dbForecast?.forecastDao()?.getAll()!!
-                withContext(Dispatchers.Main) {
-                    if(list.isEmpty()){
-                        Toast.makeText(context, "Forecast data is not your device, turn on the Internet for start work" , Toast.LENGTH_LONG).show()
-                    }else{
-                        Toast.makeText(context, "Check internet connection" , Toast.LENGTH_LONG).show()
-                        onShowForecast(forecast = list)
-                    }
-                }
-            }
+            } else {
+                Toast.makeText(context, "Turn on location", Toast.LENGTH_LONG).show()
+                val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                context.startActivity(intent) }
+        } else {
+            viewState.requestPermissions()
         }
     }
 
-    private fun onSetDB(forecast: ForecastData){
+    private fun onSetForecastDB(forecast: ForecastData){
         var list: List<ForecastDB>
         GlobalScope.launch {
             dbForecast?.forecastDao()?.deleteAll()
@@ -115,10 +132,13 @@ class ForecastPresenter: MvpPresenter<ForecastView>(){
     private fun onShowForecast(forecast: List<ForecastDB>) {
         val forecastList = mutableListOf<Pair<ForecastDB, Int>>()
         if (forecast[0].dtTxt.takeLast(8)!= "00:00:00") forecastList.add(forecast[0] to 1)
+        var i = 0
         for (weather in forecast){
-            if (weather.dtTxt.takeLast(8)=="00:00:00")
-                forecastList.add(weather to 2)
-            forecastList.add(weather to 3)
+            if(i++%2==0){
+                if (weather.dtTxt.takeLast(8)=="00:00:00")
+                    forecastList.add(weather to 2)
+                forecastList.add(weather to 3)
+            }
         }
         viewState.setForecastFragment(forecastList)
     }
@@ -135,4 +155,21 @@ class ForecastPresenter: MvpPresenter<ForecastView>(){
         val activeNetworkInfo = connectivityManager!!.activeNetworkInfo
         return activeNetworkInfo != null
     }
+
+    //check if location has turned on from the setting
+    private fun isLocationEnable(context: Context) :Boolean {
+        val locationManager: LocationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+                ||locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+    }
+
+    private fun checkPermissions(context: Context): Boolean{
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
+            == PackageManager.PERMISSION_GRANTED &&
+            ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)
+            == PackageManager.PERMISSION_GRANTED)
+            return true
+        return false
+    }
+
 }

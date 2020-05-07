@@ -2,7 +2,6 @@
 
 package com.example.testappweatherforecast.mvp
 
-import LocationService
 import android.os.Bundle
 import com.example.testappweatherforecast.R
 import com.example.testappweatherforecast.mvp.ui.FlowFragment
@@ -11,18 +10,15 @@ import moxy.MvpAppCompatActivity
 
 class MainActivity : MvpAppCompatActivity(), MainView {
 
-     override fun onCreate(savedInstanceState: Bundle?) {
-         super.onCreate(savedInstanceState)
-         setContentView(R.layout.activity_main)
+    private val flowFragment = FlowFragment()
 
-         if(savedInstanceState == null){
-             supportFragmentManager.beginTransaction()
-                 .replace(R.id.containerForFlowFragment, FlowFragment()).commitNow()
-         }
-     }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
 
-     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,
-                                             grantResults: IntArray) {
-         LocationService().handlePermissionsResult(requestCode, grantResults, this)
-     }
- }
+        if(savedInstanceState == null){
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.containerForFlowFragment, flowFragment).commitNow()
+        }
+    }
+}

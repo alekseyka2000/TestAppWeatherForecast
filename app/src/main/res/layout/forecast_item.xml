@@ -33,12 +33,14 @@
         <TextView
             android:id="@+id/timeForecastItemTextView"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:textSize="18sp"/>
 
         <TextView
             android:id="@+id/weatherForecastItemTextView"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:textSize="16sp"/>
     </LinearLayout>
 
     <TextView
@@ -47,6 +49,8 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:orientation="vertical"
+        android:textSize="24sp"
+        android:textColor="@color/colorForecastText"
         android:layout_marginEnd="10dp"
         android:layout_marginTop="15dp"
         android:layout_marginBottom="5dp"
