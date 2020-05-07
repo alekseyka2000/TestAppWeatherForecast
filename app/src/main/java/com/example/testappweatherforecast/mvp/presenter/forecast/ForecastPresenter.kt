@@ -132,17 +132,14 @@ class ForecastPresenter: MvpPresenter<ForecastView>(){
     private fun onShowForecast(forecast: List<ForecastDB>) {
         val forecastList = mutableListOf<Pair<ForecastDB, Int>>()
         if (forecast[0].dtTxt.takeLast(8)!= "00:00:00") forecastList.add(forecast[0] to 1)
-        var i = 0
         var check = ""
         for (weather in forecast){
-            if(i++%2==0){
                 if(check != weather.dtTxt){
                     check = weather.dtTxt
                     if (weather.dtTxt.takeLast(8)=="00:00:00")
                         forecastList.add(weather to 2)
                     forecastList.add(weather to 3)
                 }
-            }
         }
         viewState.setForecastFragment(forecastList)
     }

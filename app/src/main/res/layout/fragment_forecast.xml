@@ -9,8 +9,8 @@
         android:id="@+id/div"
         android:layout_width="match_parent"
         android:layout_height="7dp"
-        android:src="@drawable/div"
-        tools:ignore="ContentDescription" />
+        android:contentDescription="Divider"
+        android:src="@drawable/div" />
 
     <ProgressBar
         android:id="@+id/progressBar"
