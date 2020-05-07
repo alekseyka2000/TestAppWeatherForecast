@@ -78,9 +78,7 @@ class ForecastFragment : BaseFragment(), ForecastView, ForecastConnectivityRecei
         grantResults: IntArray)
     {
         if (requestCode == 200) {
-            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                myPresenter.getForecast(requireContext())
-            }
+            myPresenter.getForecast(requireContext())
         }
     }
 }

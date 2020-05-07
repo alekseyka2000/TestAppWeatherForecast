@@ -20,6 +20,7 @@
         android:background="@color/cardview_light_background"
         app:itemIconTint="@drawable/bottom_nav_icon_color_selector"
         app:itemTextColor="@drawable/bottom_nav_icon_color_selector"
-        app:menu="@menu/bottom_nav_menu"/>
+        app:menu="@menu/bottom_nav_menu"
+        tools:ignore="PrivateResource" />
 
 </FrameLayout>
